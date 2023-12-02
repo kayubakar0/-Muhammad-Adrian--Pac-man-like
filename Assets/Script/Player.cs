@@ -11,6 +11,14 @@ public class Player : MonoBehaviour
 
     [SerializeField] private Transform _camera;
 
+    [SerializeField] private float powerUpDuration;
+
+    private Coroutine _powerUpCoroutine;
+    
+    //Action
+    public Action OnPowerUpStart;
+    public Action OnPowerUpStop;
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -37,5 +45,30 @@ public class Player : MonoBehaviour
         Vector3 movementDirection = horizontalDirection + verticalDirection;
         
         _rigidbody.velocity = movementDirection * (speed * Time.fixedDeltaTime);
+    }
+
+    public void PickPowerUp()
+    {
+        if (_powerUpCoroutine != null)
+        {
+            StopCoroutine(_powerUpCoroutine);
+        }
+
+        _powerUpCoroutine = StartCoroutine(StartPowerUp());
+    }
+
+    IEnumerator StartPowerUp()
+    {
+        if (OnPowerUpStart != null)
+        {
+            OnPowerUpStart();
+        }
+        
+        yield return new WaitForSeconds(powerUpDuration);
+
+        if (OnPowerUpStop != null)
+        {
+            OnPowerUpStop();
+        }
     }
 }
