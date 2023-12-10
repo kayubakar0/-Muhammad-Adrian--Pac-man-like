@@ -9,9 +9,12 @@ public class PickableManager : MonoBehaviour
 
     [SerializeField] private Player player;
 
+    [SerializeField] private ScoreManager scoreManager;
+
     private void Start()
     {
         InitPickable();
+        scoreManager.SetMaxScore(_pickableList.Count);
     }
 
     private void InitPickable()
@@ -37,7 +40,12 @@ public class PickableManager : MonoBehaviour
 
         if (pickable.pickableType == PickableType.PowerUp)
         {
-            player?.PickPowerUp();
+            player.PickPowerUp();
+        }
+
+        if (scoreManager != null)
+        {
+            scoreManager.AddScore(1);
         }
     }
 }

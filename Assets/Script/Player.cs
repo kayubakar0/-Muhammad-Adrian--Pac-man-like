@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -14,6 +15,13 @@ public class Player : MonoBehaviour
     [SerializeField] private float powerUpDuration;
 
     private Coroutine _powerUpCoroutine;
+
+    private bool _isPowerUpActive;
+
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private int health;
+    
+    [SerializeField] private TMP_Text healthText;
     
     //Action
     public Action OnPowerUpStart;
@@ -25,10 +33,10 @@ public class Player : MonoBehaviour
     }
     
     private void Start()
-
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        UpdateUI();
     }
     
     void Update()
@@ -47,6 +55,11 @@ public class Player : MonoBehaviour
         _rigidbody.velocity = movementDirection * (speed * Time.fixedDeltaTime);
     }
 
+    private void UpdateUI()
+    {
+        healthText.text = "Health : " + health;
+    }
+
     public void PickPowerUp()
     {
         if (_powerUpCoroutine != null)
@@ -59,6 +72,7 @@ public class Player : MonoBehaviour
 
     IEnumerator StartPowerUp()
     {
+        _isPowerUpActive = true;
         if (OnPowerUpStart != null)
         {
             OnPowerUpStart();
@@ -66,9 +80,37 @@ public class Player : MonoBehaviour
         
         yield return new WaitForSeconds(powerUpDuration);
 
+        _isPowerUpActive = false;
         if (OnPowerUpStop != null)
         {
             OnPowerUpStop();
         }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (_isPowerUpActive)
+        {
+            if (other.gameObject.CompareTag("Enemy"))
+            {
+                other.gameObject.GetComponent<Enemy>().Dead();
+            }
+        }
+    }
+
+    public void Dead()
+    {
+        health -= 1;
+        if (health > 0)
+        {
+            transform.position = respawnPoint.position;
+        }
+        else
+        {
+            health = 0;
+            Debug.Log("Lose");
+        }
+        
+        UpdateUI();
     }
 }

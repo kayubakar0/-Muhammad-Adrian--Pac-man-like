@@ -20,9 +20,15 @@ public class Enemy : MonoBehaviour
     //Player Component
     public float chaseDistance;
     public Player player;
+    
+    //Animator
+    [HideInInspector]
+    public Animator animatorEnemy;
 
     private void Awake()
     {
+        animatorEnemy = GetComponent<Animator>();
+        
         _currentState = patrolState;
         _currentState.EnterState(this);
         
@@ -61,5 +67,21 @@ public class Enemy : MonoBehaviour
     private void StopRetreating()
     {
         SwictchState(patrolState);
+    }
+
+    public void Dead()
+    {
+        Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (_currentState != retreatState)
+        {
+            if (other.gameObject.CompareTag("Player"))
+            {
+                other.gameObject.GetComponent<Player>().Dead();
+            }
+        }
     }
 }
