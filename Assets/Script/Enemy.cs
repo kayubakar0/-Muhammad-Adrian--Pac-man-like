@@ -22,13 +22,11 @@ public class Enemy : MonoBehaviour
     public Player player;
     
     //Animator
-    [HideInInspector]
+    [Header("Animator ENemy")]
     public Animator animatorEnemy;
 
     private void Awake()
     {
-        animatorEnemy = GetComponent<Animator>();
-        
         _currentState = patrolState;
         _currentState.EnterState(this);
         
